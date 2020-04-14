@@ -1,188 +1,166 @@
 import random
 
 
-def inputPlayerLetter():
-   
+def main():
+    while True:
+        the_board = [' '] * 10
+        player_letter, computer_letter = input_player_letters()
+        turn = who_goes_first()
+        print('The ' + turn + ' will go first.')
+        game_is_playing = True
+        while game_is_playing:
+            if turn == 'player':
+                gui(the_board)
+                move = get_player_move(the_board)
+                make_move(the_board, player_letter, move)
+                if is_winner(the_board, player_letter):
+                    gui(the_board)
+                    print('Hooray! You have won the game!')
+                    game_is_playing = False
+                else:
+                    if is_board_full(the_board):
+                        gui(the_board)
+                        print('The game is a tie!')
+                        break
+                    else:
+                        turn = 'computer'
+            else:
+                move = get_computer_move(the_board, computer_letter)
+                make_move(the_board, computer_letter, move)
+                if is_winner(the_board, computer_letter):
+                    gui(the_board)
+                    print('The computer has beaten you! You lose.')
+                    game_is_playing = False
+                else:
+                    if is_board_full(the_board):
+                        gui(the_board)
+                        print('The game is a tie!')
+                        break
+                    else:
+                        turn = 'player'
+        if not play_again():
+            break
+
+
+def input_player_letters():
     letter = ''
     while not (letter == 'X' or letter == 'O'):
         print('Do you want to be X or O?')
         letter = input().upper()
-
     if letter == 'X':
         return ['X', 'O']
     else:
         return ['O', 'X']
 
 
-def whoGoesFirst():
-    
+def who_goes_first():
     if random.randint(0, 1) == 0:
         return 'computer'
     else:
         return 'player'
 
 
-def playAgain():
-    
+def play_again():
     print('Do you want to play again? (yes or no)')
     return input().lower().startswith('y')
 
 
-def makeMove(board, letter, move):
+def make_move(board, letter, move):
     board[move] = letter
 
 
-def isWinner(bo, le):
-   
-    return ((bo[7] == le and bo[8] == le and bo[9] == le) or  
-            (bo[4] == le and bo[5] == le and bo[6] == le) or  
-            (bo[1] == le and bo[2] == le and bo[3] == le) or  
-            (bo[7] == le and bo[4] == le and bo[1] == le) or  
-            (bo[8] == le and bo[5] == le and bo[2] == le) or  
-            (bo[9] == le and bo[6] == le and bo[3] == le) or  
-            (bo[7] == le and bo[5] == le and bo[3] == le) or  
-            (bo[9] == le and bo[5] == le and bo[1] == le)) 
+def is_winner(board, letter):
+    return ((board[7] == letter and board[8] == letter and board[9] == letter) or
+            (board[4] == letter and board[5] == letter and board[6] == letter) or
+            (board[1] == letter and board[2] == letter and board[3] == letter) or
+            (board[7] == letter and board[4] == letter and board[1] == letter) or
+            (board[8] == letter and board[5] == letter and board[2] == letter) or
+            (board[9] == letter and board[6] == letter and board[3] == letter) or
+            (board[7] == letter and board[5] == letter and board[3] == letter) or
+            (board[9] == letter and board[5] == letter and board[1] == letter))
 
 
-def getBoardCopy(board):
-    
-    dupeBoard = []
-
+def get_board_copy(board):
+    dupe_board = []
     for i in board:
-        dupeBoard.append(i)
+        dupe_board.append(i)
+    return dupe_board
 
-    return dupeBoard
 
-
-def isSpaceFree(board, move):
-    
+def is_space_free(board, move):
     return board[move] == ' '
 
 
-def getPlayerMove(board):
-    
+def get_player_move(board):
     move = ' '
-    while move not in '1 2 3 4 5 6 7 8 9'.split() or not isSpaceFree(board, int(move)):
+    while move not in '1 2 3 4 5 6 7 8 9'.split() or not is_space_free(board, int(move)):
         print('What is your next move? (1-9)')
         move = input()
     return int(move)
 
 
-def chooseRandomMoveFromList(board, movesList):
-    
+def choose_random_move_from_list(board, movesList):
     possibleMoves = []
     for i in movesList:
-        if isSpaceFree(board, i):
+        if is_space_free(board, i):
             possibleMoves.append(i)
-
     if len(possibleMoves) != 0:
         return random.choice(possibleMoves)
     else:
         return None
 
 
-def getComputerMove(board, computerLetter):
-    
-    if computerLetter == 'X':
-        playerLetter = 'O'
+def get_computer_move(board, computer_letter):
+    if computer_letter == 'X':
+        player_letter = 'O'
     else:
-        playerLetter = 'X'
+        player_letter = 'X'
 
-    
     for i in range(1, 10):
-        copy = getBoardCopy(board)
-        if isSpaceFree(copy, i):
-            makeMove(copy, computerLetter, i)
-            if isWinner(copy, computerLetter):
+        copy = get_board_copy(board)
+        if is_space_free(copy, i):
+            make_move(copy, computer_letter, i)
+            if is_winner(copy, computer_letter):
                 return i
 
-    
     for i in range(1, 10):
-        copy = getBoardCopy(board)
-        if isSpaceFree(copy, i):
-            makeMove(copy, playerLetter, i)
-            if isWinner(copy, playerLetter):
+        copy = get_board_copy(board)
+        if is_space_free(copy, i):
+            make_move(copy, player_letter, i)
+            if is_winner(copy, player_letter):
                 return i
 
-    move = chooseRandomMoveFromList(board, [1, 3, 7, 9])
-    if move != None:
+    move = choose_random_move_from_list(board, [1, 3, 7, 9])
+    if move is not None:
         return move
-
     
-    if isSpaceFree(board, 5):
+    if is_space_free(board, 5):
         return 5
 
-    return chooseRandomMoveFromList(board, [2, 4, 6, 8])
+    return choose_random_move_from_list(board, [2, 4, 6, 8])
 
 
-def isBoardFull(board):
-    
+def is_board_full(board):
     for i in range(1, 10):
-        if isSpaceFree(board, i):
+        if is_space_free(board, i):
             return False
     return True
 
 
 def gui(board):
-    
-    print('   |   |')
-    print(' ' + board[1] + ' | ' + board[2] + ' | ' + board[3])
-    print('   |   |')
-    print('-----------')
-    print('   |   |')
-    print(' ' + board[4] + ' | ' + board[5] + ' | ' + board[6])
-    print('   |   |')
-    print('-----------')
-    print('   |   |')
-    print(' ' + board[7] + ' | ' + board[8] + ' | ' + board[9])
-    print('   |   |')
-
-print('Welcome to Tic Tac Toe!')
+    print('     |     |')
+    print('  ' + board[1] + '  |  ' + board[2] + '  |  ' + board[3])
+    print('     |     |')
+    print('-----------------')
+    print('     |     |')
+    print('  ' + board[4] + '  |  ' + board[5] + '  |  ' + board[6])
+    print('     |     |')
+    print('-----------------')
+    print('     |     |')
+    print('  ' + board[7] + '  |  ' + board[8] + '  |  ' + board[9])
+    print('     |     |')
 
 
-while True:
-    
-    theBoard = [' '] * 10
-    playerLetter, computerLetter = inputPlayerLetter()
-    turn = whoGoesFirst()
-    print('The ' + turn + ' will go first.')
-    gameIsPlaying = True
-
-    while gameIsPlaying:
-        if turn == 'player':
-            
-            gui(theBoard)
-            move = getPlayerMove(theBoard)
-            makeMove(theBoard, playerLetter, move)
-
-            if isWinner(theBoard, playerLetter):
-                gui(theBoard)
-                print('Hooray! You have won the game!')
-                gameIsPlaying = False
-            else:
-                if isBoardFull(theBoard):
-                    gui(theBoard)
-                    print('The game is a tie!')
-                    break
-                else:
-                    turn = 'computer'
-
-        else:
-            
-            move = getComputerMove(theBoard, computerLetter)
-            makeMove(theBoard, computerLetter, move)
-
-            if isWinner(theBoard, computerLetter):
-                gui(theBoard)
-                print('The computer has beaten you! You lose.')
-                gameIsPlaying = False
-            else:
-                if isBoardFull(theBoard):
-                    gui(theBoard)
-                    print('The game is a tie!')
-                    break
-                else:
-                    turn = 'player'
-
-    if not playAgain():
-        break
+if __name__ == "__main__":
+    print('Welcome to Tic Tac Toe!')
+    main()
