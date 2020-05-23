@@ -1,5 +1,7 @@
-import random
+# Created By Parth Dani
+# Date : 15/10/2017
 
+import random
 
 def main():
     while True:
